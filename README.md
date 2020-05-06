@@ -19,6 +19,44 @@ Google Timeline exports your location history using the `kml` format. There are 
 
 ## Usage
 
+### Authentication
+
+In order to download location history from Google Maps, you must be authenticated. Authentication is done by passing an authentication cookie to `TimelineExtractor`.
+
+#### Get authentication cookie
+
+Follow the steps below to get your authentication cookie from Google Maps Timeline:
+
+1. Go to [Timeline](https://www.google.com/maps/timeline) using [Google Chrome](https://www.google.com/chrome/) or another Chromium-based browser.
+2. Open `Developer tools` (`Ctrl+Shift+I`).
+3. Go to the `Network` tab.
+4. Enter this URL in the address bar of your browser: `https://www.google.com/maps/timeline/kml?authuser=0&pb=!1m8!1m3!1i2020!2i0!3i1!2m3!1i2020!2i0!3i1`
+5. A new request will appear in the `Developer tools`. Copy it as `cURL`.
+
+   ![Copy request as cURL](docs/get-authentication-cookie.png)
+
+6. Paste the copied request into a text editor.
+7. You should get something like this:
+```
+curl "https://www.google.com/maps/timeline/kml?authuser=0^&pb=^!1m8^!1m3^!1i2020^!2i0^!3i1^!2m3^!1i2020^!2i0^!3i1" ^
+  -H "accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ^
+  -H "accept-language: en" ^
+  -H "authority: www.google.com" ^
+  -H "cookie: <COOKIE CONTENT>" ^
+  -H "user-agent: Mozilla/5.0" ^
+  --compressed
+```
+
+8. Save the cookie content (what is replaced by `<COOKIE CONTENT>` above) so you can use it to authenticate requests sent by `TimelineExtractor` when downloading location history. It is recommended to store it in a file called `cookie` in the directory `src`, as that will be assumed in most of the examples further down.
+
+#### Authenticate
+
+To authenticate, specify the path to your cookie file using the `-c` or `--cookie` argument when running `TimelineExtractor`:
+
+```
+python extract.py -c path/to/cookie
+```
+
 ### Get location history
 
 There are three ways to specify which dates to extract location history for:
