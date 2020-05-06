@@ -2,8 +2,9 @@ import argparse
 import datetime as DT
 import logging
 import sys
-from typing import List
+from typing import List, Optional
 import xml.etree.ElementTree as ET
+import CaptureDate
 import LocationHistory
 
 def OutputLocationHistory(History: ET.ElementTree) -> None:
@@ -26,6 +27,20 @@ def GetLocationHistoryForDateRange(StartDate: DT.date, EndDate: DT.date, AuthCoo
     return LocationHistory.GetDateRange(StartDate, EndDate, AuthCookie)
 
 
+def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, AuthCookie: str) -> Optional[ET.ElementTree]:
+    DateTimes = set()
+    for Path in Paths:
+        logging.info('Calculating dates for photos in %s', Path)
+        DateTimes.update(CaptureDate.GetFromPath(Path, VisitSubdirectories))
+
+    if not bool(DateTimes):
+        logging.warning('No dates found to extract location history for.')
+        return None
+
+    Dates = list(set(map(lambda d: d.date(), DateTimes)))
+    return GetLocationHistoryForDates(Dates, AuthCookie)
+
+
 def StringToDate(DateString: str) -> DT.date:
     return DT.datetime.strptime(DateString, '%Y-%m-%d').date()
 
@@ -46,6 +61,11 @@ def main() -> None:
     RangeParser.add_argument('start', type=StringToDate, help='First date to extract location history for. Format: YYYY-MM-DD')
     RangeParser.add_argument('end', type=StringToDate, help='Last date to extract location history for. Format: YYYY-MM-DD')
 
+    # Argument parser for directory mode.
+    PhotoParser = Subparsers.add_parser('photo')
+    PhotoParser.add_argument('photo', nargs='+', help='One or more photos or directories to extract location history for. History will be extracted for the capture dates of the photos.')
+    PhotoParser.add_argument('-s', '--subdir', action='store_true', default=False, help='Also consider photos in subdirectories.')
+
     Args = Parser.parse_args()
 
     AuthCookie = Args.cookie.read()
@@ -57,6 +77,8 @@ def main() -> None:
         History = GetLocationHistoryForDates(Args.date, AuthCookie)
     elif Args.mode == 'range':
         History = GetLocationHistoryForDateRange(Args.start, Args.end, AuthCookie)
+    elif Args.mode == 'photo':
+        History = GetLocationHistoryForPaths(Args.photo, Args.subdir, AuthCookie)
 
     if History is None:
         logging.error('Location history could not be calculated.')
