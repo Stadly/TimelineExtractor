@@ -74,6 +74,14 @@ Use the `-s` or `--subdir` argument to download location history also for photos
 python extract.py -c cookie photo -s path/to/directory-tree
 ```
 
+### Store the location history
+
+The downloaded location history is written to `stdout`. To store it in a file, simply redirect `stdout` to the file:
+
+``` bash
+python extract.py -c cookie date 2020-01-01 > path/to/location-history.kml
+```
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for information on what has changed recently.
