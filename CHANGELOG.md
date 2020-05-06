@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Nothing
+- Possibility to extract location history for one or more dates.
 
 ### Changed
 - Nothing
