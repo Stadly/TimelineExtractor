@@ -21,6 +21,11 @@ def GetLocationHistoryForDates(Dates: List[DT.date], AuthCookie: str) -> ET.Elem
     return LocationHistory.GetDates(Dates, AuthCookie)
 
 
+def GetLocationHistoryForDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str) -> ET.ElementTree:
+    logging.info('Calculating location history for {:%Y-%m-%d} to {:%Y-%m-%d}'.format(StartDate, EndDate))
+    return LocationHistory.GetDateRange(StartDate, EndDate, AuthCookie)
+
+
 def StringToDate(DateString: str) -> DT.date:
     return DT.datetime.strptime(DateString, '%Y-%m-%d').date()
 
@@ -36,6 +41,11 @@ def main() -> None:
     DateParser = Subparsers.add_parser('date')
     DateParser.add_argument('date', nargs='+', type=StringToDate, help='One or more dates to extract location history for. Format: YYYY-MM-DD')
 
+    # Argument parser for date range mode.
+    RangeParser = Subparsers.add_parser('range')
+    RangeParser.add_argument('start', type=StringToDate, help='First date to extract location history for. Format: YYYY-MM-DD')
+    RangeParser.add_argument('end', type=StringToDate, help='Last date to extract location history for. Format: YYYY-MM-DD')
+
     Args = Parser.parse_args()
 
     AuthCookie = Args.cookie.read()
@@ -45,6 +55,8 @@ def main() -> None:
     History = None
     if Args.mode == 'date':
         History = GetLocationHistoryForDates(Args.date, AuthCookie)
+    elif Args.mode == 'range':
+        History = GetLocationHistoryForDateRange(Args.start, Args.end, AuthCookie)
 
     if History is None:
         logging.error('Location history could not be calculated.')
