@@ -73,7 +73,7 @@ curl "https://www.google.com/maps/timeline/kml?authuser=0^&pb=^!1m8^!1m3^!1i2020
 
 #### Authenticate
 
-To authenticate, specify the path to your cookie file using the `-c` or `--cookie` argument when running `TimelineExtractor`:
+To authenticate, specify the path to your authentication cookie using the `-c` or `--cookie` argument when running `TimelineExtractor`:
 
 ```
 python extract.py -c path/to/cookie
