@@ -17,6 +17,28 @@ You can easily [download the raw data](https://takeout.google.com/) saved by Goo
 
 Google Timeline exports your location history using the `kml` format. There are som issues with how Google formats the files, making them incompatible with software such as [GPSBabel](https://www.gpsbabel.org). `TimelineExtractor` takes care of these issues, generating valid `kml` files.
 
+## Installation
+
+Use the following commands to set up `TimelineExtractor`.
+
+Download `TimelineExtractor`:
+
+``` bash
+git clone --depth 1 https://github.com/Stadly/TimelineExtractor.git
+```
+
+Install dependencies:
+
+``` bash
+pip install -r TimelineExtractor/requirements.txt
+```
+
+Change working directory:
+
+``` bash
+cd TimelineExtractor/src
+```
+
 ## Usage
 
 ### Authentication
