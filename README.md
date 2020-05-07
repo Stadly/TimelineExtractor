@@ -69,6 +69,12 @@ curl "https://www.google.com/maps/timeline/kml?authuser=0^&pb=^!1m8^!1m3^!1i2020
 
 ## Usage
 
+`TimelineExtractor` is run with the python file `extract.py`:
+
+```
+python extract.py
+```
+
 ### Authenticate
 
 To authenticate, specify the path to your authentication cookie using the `-c` or `--cookie` argument when running `TimelineExtractor`:
