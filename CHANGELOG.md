@@ -7,7 +7,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## Unreleased
 
 ### Added
-- Nothing
 - Possibility to extract location history for one or more dates.
 - Possibility to extract location history for date range.
 - Possibility to extract location history for the caputure dates of one or more photos.
