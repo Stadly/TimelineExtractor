@@ -67,6 +67,10 @@ curl "https://www.google.com/maps/timeline/kml?authuser=0^&pb=^!1m8^!1m3^!1i2020
 
 8. Save the cookie content (what is replaced by `<COOKIE CONTENT>` above) so you can use it to authenticate requests sent by `TimelineExtractor` when downloading location history. It is recommended to store it in a file called `cookie` in the directory `src`, as that will be assumed in most of the examples further down.
 
+### Install in Docker container
+
+It is also possible to set up and use `TimelineExtractor` in a docker container instead of installing it locally. See the section [Using Docker](#using-docker) for details.
+
 ## Usage
 
 `TimelineExtractor` is run with the python file `extract.py`:
