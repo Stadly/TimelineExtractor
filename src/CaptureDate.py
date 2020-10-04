@@ -34,7 +34,12 @@ def GetFromXmpFile(FilePath: str) -> Optional[DT.datetime]:
     }
 
     Exif = XmpTree.find('rdf:RDF/rdf:Description', XmpNs)
+    if Exif is None:
+        return None
+
     DateTimeString = Exif.get('{' + XmpNs['exif'] + '}DateTimeOriginal')
+    if DateTimeString is None:
+        return None
 
     if re.match('\\d+-\\d+-\\d+T\\d+:\\d+:\\d+\\.\\d+', DateTimeString):
         return DT.datetime.strptime(DateTimeString, '%Y-%m-%dT%H:%M:%S.%f')
