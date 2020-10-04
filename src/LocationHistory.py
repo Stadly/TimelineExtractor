@@ -61,8 +61,10 @@ def GetDate(Date: DT.date, AuthCookie: str) -> ET.ElementTree:
     Url = 'https://www.google.com/maps/timeline/kml?authuser=0&pb=!1m8!1m3!1i{0}!2i{1}!3i{2}!2m3!1i{0}!2i{1}!3i{2}'.format(Date.year, Date.month - 1, Date.day)
 
     Response = requests.get(Url, cookies=dict(cookie=AuthCookie))
-    if 200 == Response.status_code:
-        return ET.ElementTree(ET.fromstring(Response.text))
+    if 200 != Response.status_code:
+        raise Exception('Could not fetch location history.')
+
+    return ET.ElementTree(ET.fromstring(Response.text))
 
 
 def GetDates(Dates: List[DT.date], AuthCookie: str) -> ET.ElementTree:
