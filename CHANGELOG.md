@@ -4,25 +4,10 @@ All notable changes to `TimelineExtractor` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## [Unreleased](https://github.com/Stadly/TimelineExtractor/compare/v1.0.0...HEAD)
+## [v1.1.0](https://github.com/Stadly/TimelineExtractor/compare/v1.0.0...v1.1.0)
 
 ### Added
-- Nothing
-
-### Changed
-- Nothing
-
-### Fixed
-- Nothing
-
-### Deprecated
-- Nothing
-
-### Removed
-- Nothing
-
-### Security
-- Nothing
+- Better error handling.
 
 ## v1.0.0 - 2020-05-08
 

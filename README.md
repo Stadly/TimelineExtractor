@@ -24,7 +24,7 @@ Use the following commands to set up `TimelineExtractor`.
 Download `TimelineExtractor`:
 
 ``` bash
-git clone -b v1.0.0 --depth 1 https://github.com/Stadly/TimelineExtractor.git
+git clone -b v1.1.0 --depth 1 https://github.com/Stadly/TimelineExtractor.git
 ```
 
 Install dependencies:
