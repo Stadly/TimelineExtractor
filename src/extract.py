@@ -46,7 +46,7 @@ def StringToDate(DateString: str) -> DT.date:
 
 
 def main() -> None:
-    Parser = argparse.ArgumentParser(description="Extract location history from Google.")
+    Parser = argparse.ArgumentParser(description='Extract location history from Google.')
     Parser.add_argument('-l', '--log', default='info', choices=['debug', 'info', 'warning', 'error', 'critical'], help='Set the logging level.')
     Parser.add_argument('-c', '--cookie', required=True, type=open, help='File containing your Google authentication cookie.')
 
