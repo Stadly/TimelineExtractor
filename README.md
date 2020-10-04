@@ -196,6 +196,12 @@ In the following example, the local directory `/path/to/photos` is mounted to `/
 docker run -v /path/to/photos:/photos timeline-extract -c cookie photo /photos/my-image.jpg /photos/more-photos
 ```
 
+If you want to mount a directory using a relative path, you can use `$(pwd)` denote the current working directory:
+
+``` bash
+docker run -v "$(pwd):/photos" timeline-extract -c cookie photo /photos
+```
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for information on what has changed recently.
