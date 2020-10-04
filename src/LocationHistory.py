@@ -131,7 +131,7 @@ def ConvertTimeSpanPointToLineString(KmlTree: ET.ElementTree) -> None:
         if Point is not None and TimeSpan is not None:
             Point.tag = '{' + Ns['ns'] + '}LineString'
             Coordinates = Point.find('ns:coordinates', Ns)
-            if Coordinates is not None:
+            if Coordinates is not None and Coordinates.text is not None:
                 Coordinates.text = Coordinates.text + ' ' + Coordinates.text
 
 
@@ -152,13 +152,13 @@ def RemoveErroneousAltitude(KmlTree: ET.ElementTree) -> None:
         Point = Placemark.find('ns:Point', Ns)
         if Point is not None:
             Coordinates = Point.find('ns:coordinates', Ns)
-            if Coordinates is not None and re.search(RegEx, Coordinates.text):
+            if Coordinates is not None and Coordinates.text is not None and re.search(RegEx, Coordinates.text):
                 # All altitudes are 0. Remove them.
                 Coordinates.text = re.sub(CoordinatesRegEx, '\\1', Coordinates.text)
 
         LineString = Placemark.find('ns:LineString', Ns)
         if LineString is not None:
             Coordinates = LineString.find('ns:coordinates', Ns)
-            if Coordinates is not None and re.search(RegEx, Coordinates.text):
+            if Coordinates is not None and Coordinates.text is not None and re.search(RegEx, Coordinates.text):
                 # All altitudes are 0. Remove them.
                 Coordinates.text = re.sub(CoordinatesRegEx, '\\1', Coordinates.text)
