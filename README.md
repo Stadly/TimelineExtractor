@@ -193,7 +193,7 @@ When extracting location history for photos, the docker container must be able t
 In the following example, the local directory `/path/to/photos` is mounted to `/photos` in the container. Location history is then calculated for the photo `/photos/my-image.jpg` (refers to `/path/to/photos/my-image.jpg` in the local file system) and the photos contained in `/photos/more-photos` (refers to `/path/to/photos/more-photos` in the local file system).
 
 ``` bash
-docker run --mount source=/path/to/photos,destination=/photos timeline-extract -c cookie photo /photos/my-image.jpg /photos/more-photos
+docker run -v /path/to/photos:/photos timeline-extract -c cookie photo /photos/my-image.jpg /photos/more-photos
 ```
 
 ## Change log
