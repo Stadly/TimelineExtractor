@@ -36,7 +36,7 @@ def GetFromXmpFile(FilePath: str) -> Optional[DT.datetime]:
     Exif = XmpTree.find('rdf:RDF/rdf:Description', XmpNs)
     DateTimeString = Exif.get('{' + XmpNs['exif'] + '}DateTimeOriginal')
 
-    if re.match('\d+-\d+-\d+T\d+:\d+:\d+\.\d+', DateTimeString):
+    if re.match('\\d+-\\d+-\\d+T\\d+:\\d+:\\d+\\.\\d+', DateTimeString):
         return DT.datetime.strptime(DateTimeString, '%Y-%m-%dT%H:%M:%S.%f')
 
     return DT.datetime.fromisoformat(DateTimeString)
