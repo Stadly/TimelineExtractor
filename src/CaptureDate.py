@@ -15,6 +15,9 @@ def GetFromPictureFile(FilePath: str) -> Optional[DT.datetime]:
     except:
         return None
 
+    if 'Exif' not in Exif or 36867 not in Exif['Exif']:
+        return None
+
     DateTimeString = Exif['Exif'][36867].decode('utf-8')
     return DT.datetime.strptime(DateTimeString, '%Y:%m:%d %H:%M:%S')
 
