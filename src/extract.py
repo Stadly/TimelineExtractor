@@ -18,19 +18,19 @@ def OutputLocationHistory(History: ET.ElementTree) -> None:
 
 
 def GetLocationHistoryForDates(Dates: List[DT.date], AuthCookie: str) -> ET.ElementTree:
-    logging.info('Calculating location history for %d date(s)', len(Dates))
+    logging.info(f'Calculating location history for {len(Dates)} date(s)')
     return LocationHistory.GetDates(Dates, AuthCookie)
 
 
 def GetLocationHistoryForDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str) -> ET.ElementTree:
-    logging.info('Calculating location history for {:%Y-%m-%d} to {:%Y-%m-%d}'.format(StartDate, EndDate))
+    logging.info(f'Calculating location history for {StartDate:%Y-%m-%d} to {EndDate:%Y-%m-%d}')
     return LocationHistory.GetDateRange(StartDate, EndDate, AuthCookie)
 
 
 def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, AuthCookie: str) -> Optional[ET.ElementTree]:
     DateTimes = set()
     for Path in Paths:
-        logging.info('Calculating dates for photos in %s', Path)
+        logging.info(f'Calculating dates for photos in {Path}')
         DateTimes.update(CaptureDate.GetFromPath(Path, VisitSubdirectories))
 
     if not bool(DateTimes):
