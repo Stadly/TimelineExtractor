@@ -175,17 +175,17 @@ python extract.py -l debug -c cookie date 2020-01-01
 Build the docker image using the following command. Note that you should [save you authentication cookie](#get-authentication-cookie) before building the docker image so that it becomes part of the image.
 
 ``` bash
-docker build -t timeline-extract .
+docker build -t extract-timeline .
 ```
 
 #### Run the docker container
 
-After the image is built, just run it to use `TimelineExtractor`. The syntax when running `TimelineExtractor` inside the docker container is the same as when running it locally, except that `python extract.py` is replaced by `docker run timeline-extract`.
+After the image is built, just run it to use `TimelineExtractor`. The syntax when running `TimelineExtractor` inside the docker container is the same as when running it locally, except that `python extract.py` is replaced by `docker run extract-timeline`.
 
 For example, the following command will extract location history for the date `2020-01-01` and store it in the file `timeline.kml` in your current working directory:
 
 ``` bash
-docker run timeline-extract -c cookie date 2020-01-01 > timeline.kml
+docker run extract-timeline -c cookie date 2020-01-01 > timeline.kml
 ```
 
 When extracting location history for photos, the docker container must be able to access to the photos in order to get their capture dates. This is achieved by mounting the directories containing the photos to the docker container. When mounting a directory, specify the absolute path of the directory in the local file system as the `source`, and the absolute path of where to mount it in the container as `destination`. Use the destination paths when specifying the photos and directories to get location history for.
@@ -193,13 +193,13 @@ When extracting location history for photos, the docker container must be able t
 In the following example, the local directory `/path/to/photos` is mounted to `/photos` in the container. Location history is then calculated for the photo `/photos/my-image.jpg` (refers to `/path/to/photos/my-image.jpg` in the local file system) and the photos contained in `/photos/more-photos` (refers to `/path/to/photos/more-photos` in the local file system).
 
 ``` bash
-docker run -v /path/to/photos:/photos timeline-extract -c cookie photo /photos/my-image.jpg /photos/more-photos
+docker run -v /path/to/photos:/photos extract-timeline -c cookie photo /photos/my-image.jpg /photos/more-photos
 ```
 
-If you want to mount a directory using a relative path, you can use `$(pwd)` denote the current working directory:
+If you want to mount a directory using a relative path, you can use `$(pwd)` to denote the current working directory:
 
 ``` bash
-docker run -v "$(pwd):/photos" timeline-extract -c cookie photo /photos
+docker run -v "$(pwd):/photos" extract-timeline -c cookie photo /photos
 ```
 
 ## Change log
