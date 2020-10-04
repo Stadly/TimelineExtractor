@@ -188,7 +188,7 @@ For example, the following command will extract location history for the date `2
 docker run extract-timeline -c cookie date 2020-01-01 > timeline.kml
 ```
 
-When extracting location history for photos, the docker container must be able to access to the photos in order to get their capture dates. This is achieved by mounting the directories containing the photos to the docker container. When mounting a directory, specify the absolute path of the directory in the local file system as the `source`, and the absolute path of where to mount it in the container as `destination`. Use the destination paths when specifying the photos and directories to get location history for.
+When extracting location history for photos, the docker container must be able to access to the photos in order to get their capture dates. This is achieved by mounting the directories containing the photos to the docker container. To mount a directory, use the `-v` or `--volume` argument and specify the absolute path of the directory in the local file system, followed by `:` and the absolute path of where it should be accessible in the container. Use the latter paths when specifying the photos and directories to get location history for.
 
 In the following example, the local directory `/path/to/photos` is mounted to `/photos` in the container. Location history is then calculated for the photo `/photos/my-image.jpg` (refers to `/path/to/photos/my-image.jpg` in the local file system) and the photos contained in `/photos/more-photos` (refers to `/path/to/photos/more-photos` in the local file system).
 
