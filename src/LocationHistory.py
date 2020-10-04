@@ -31,8 +31,15 @@ def Merge(LocationHistory1: ET.ElementTree, LocationHistory2: ET.ElementTree) ->
 
     Document1 = LocationHistory1.find('ns:Document', Ns)
     Document2 = LocationHistory2.find('ns:Document', Ns)
-    Name = Document1.find('ns:name', Ns)
-    Name.text += '\n' + Document2.find('ns:name', Ns).text
+    if Document1 is None or Document2 is None:
+        raise Exception('Location history is malformed.')
+
+    Name1 = Document1.find('ns:name', Ns)
+    Name2 = Document2.find('ns:name', Ns)
+    if Name1 is None or Name1.text is None or Name2 is None or Name2.text is None:
+        raise Exception('Location history is malformed.')
+
+    Name1.text += '\n' + Name2.text
 
     LastPlacermark1 = Document1.find('ns:Placemark[last()]', Ns)
     FirstPlacermark2 = Document2.find('ns:Placemark[1]', Ns)
