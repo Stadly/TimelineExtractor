@@ -8,14 +8,14 @@ Extract location history from Google Maps Timeline.
 
 By enabling Location History in Google Maps, Google will save your location data and processes it in order to create your personal [Timeline](https://www.google.com/maps/timeline).
 
-You can easily [download the raw data](https://takeout.google.com/) saved by Google. It is also possible to download the processed location history for a single day, but not to download more than one day at a time.
+You can easily [download the raw data](https://takeout.google.com/) saved by Google; this will put your timeline data in `JSON` files that do not contain the same level of detail as downloading the `kml` files. It is also possible to download a `kml` file of the processed location history for a single day, but it is not possible to download more than one day at a time.
 
 `TimelineExtractor` lets you easily download your location history. There are multiple options for specifying which dates to download:
 - Specify one or more dates.
 - Specify a date range.
 - Specify one or more photos or directories, to download location history for the capture dates of the photos and contained photos.
 
-Google Timeline exports your location history using the `kml` format. There are som issues with how Google formats the files, making them incompatible with software such as [GPSBabel](https://www.gpsbabel.org). `TimelineExtractor` takes care of these issues, generating valid `kml` files.
+Google Timeline exports your location history using the `kml` format. There are some issues with how Google formats the files, making them incompatible with software such as [GPSBabel](https://www.gpsbabel.org). `TimelineExtractor` takes care of these issues, generating valid `kml` files.
 
 ## Installation
 
@@ -41,31 +41,26 @@ cd TimelineExtractor/src
 
 ### Authentication
 
-In order to download location history from Google Maps, you must be authenticated. Authentication is done by passing an authentication cookie to `TimelineExtractor`.
+In order to download location history from Google Maps, you must be authenticated. Authentication is done by passing an authentication cookie, authenticated user number, and a reauth proof token to `TimelineExtractor`.
 
 Follow the steps below to get your authentication cookie from Google Maps Timeline:
 
-1. Go to [Timeline](https://www.google.com/maps/timeline) using [Google Chrome](https://www.google.com/chrome/) or another Chromium-based browser.
-2. Open `Developer tools` (`Ctrl+Shift+I`).
-3. Go to the `Network` tab.
-4. Enter this URL in the address bar of your browser: `https://www.google.com/maps/timeline/kml?authuser=0&pb=!1m8!1m3!1i2020!2i0!3i1!2m3!1i2020!2i0!3i1`
-5. A new request will appear in the `Developer tools`. Copy it as `cURL`.
+1. Go to [Timeline](https://www.google.com/maps/timeline) in [Firefox](https://www.mozilla.org/en-US/firefox/) (steps have been tested in Firefox, though other browsers should work similarly).
+2. Open `Developer tools` (`F12`).
+3. In the console, run this command to download the currently selected day's KML file `document.querySelector('.goog-menuitem.export-kml').click();`.
+4. A new tab will briefly open and your KML download will start.
+  - Depending on your browser settings, you may get a message saying that a pop-up has been prevented from opening; click the message and open the pop-up.
+  - If you are prompted to save or cancel the download, be sure to save it (otherwise the URL may not be logged in the history and we'll need that).
+5. Open the browser history (`CTRL` + `Shift` + `H`).
+6. Copy the most recent URL, which should be something like this: `https://timeline.google.com/maps/timeline/kml?authuser=1&pb=%211m8%211m3%211i1990%212i0%213i1%212m3%211i2090%212i0%213i1&pli=1&rapt=<REAUTH PROOF TOKEN>`.
+7. With the Developer tools still open, paste that URL into the address bar of your browser.
+8. A new request will appear in the `Network` tab. Click on it.
+9. Details about the request should appear; look for the `Cookie` in the request headers and copy the cookie value.
+10. Save the cookie's content so you can use it to authenticate requests sent by `TimelineExtractor` when downloading location history. It is recommended to store it in a file called `cookie` in the directory `src`, as that will be assumed in most of the examples further down.
+11. Make note of the `authuser` number in the URL.  Pass this to the `TimelineExtractor` script with the `-u` or `--authuser` argument.
+12. Copy the value of the `rapt` parameter in the URL.  Pass this to the `TimelineExtractor` script with the `-r` or `--rapt` argument.
 
-   ![Copy request as cURL](docs/get-authentication-cookie.png)
-
-6. Paste the copied request into a text editor.
-7. You should get something like this:
-```
-curl "https://www.google.com/maps/timeline/kml?authuser=0^&pb=^!1m8^!1m3^!1i2020^!2i0^!3i1^!2m3^!1i2020^!2i0^!3i1" ^
-  -H "accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ^
-  -H "accept-language: en" ^
-  -H "authority: www.google.com" ^
-  -H "cookie: <COOKIE CONTENT>" ^
-  -H "user-agent: Mozilla/5.0" ^
-  --compressed
-```
-
-8. Save the cookie content (what is replaced by `<COOKIE CONTENT>` above) so you can use it to authenticate requests sent by `TimelineExtractor` when downloading location history. It is recommended to store it in a file called `cookie` in the directory `src`, as that will be assumed in most of the examples further down.
+Please note that valid cookie and reauth proof tokens change frequently, so these steps may need to be repeated, depending on your usage of the `TimelineExtractor`.
 
 ### Install in Docker container
 
@@ -81,10 +76,14 @@ python extract.py
 
 ### Authenticate
 
-To authenticate, specify the path to your authentication cookie using the `-c` or `--cookie` argument when running `TimelineExtractor`:
+To authenticate, specify the following arguments when running `TimelineExtractor`:
+  - The path to your authentication cookie using the `-c` or `--cookie` argument.
+  - The authuser number using the `-u` or `--authuser` argument.
+  - The reauth proof token using the `-r` or `--rapt` argument.
+  - The output file path using the `-o` or `--output` argument.
 
 ```
-python extract.py -c path/to/cookie
+python extract.py -c path/to/cookie -u 1 -r token_value -o path/to/output/file
 ```
 
 ### Get location history
@@ -99,13 +98,13 @@ There are three ways to specify which dates to extract location history for:
 To download location history for a date, simply use the `date` mode and specify the date in `YYYY-MM-DD` format:
 
 ``` bash
-python extract.py -c cookie date 2020-01-01
+python extract.py -c cookie -u 1 -r token -o output.kml date 2020-01-01
 ```
 
 If you specify multiple dates, location history will be downloaded for all of them:
 
 ``` bash
-python extract.py -c cookie date 2020-01-01 2020-01-05 2020-02-10
+python extract.py -c cookie -u 1 -r token -o output.kml date 2020-01-01 2020-01-05 2020-02-10
 ```
 
 #### Get location history for a date range
@@ -113,7 +112,7 @@ python extract.py -c cookie date 2020-01-01 2020-01-05 2020-02-10
 To download location history for a date range, simply use the `range` mode and specify the first date and last date in `YYYY-MM-DD` format:
 
 ``` bash
-python extract.py -c cookie range 2020-01-01 2020-01-31
+python extract.py -c cookie -u 1 -r token -o output.kml range 2020-01-01 2020-01-31
 ```
 
 #### Get location history for one or more photos or directories
@@ -121,33 +120,25 @@ python extract.py -c cookie range 2020-01-01 2020-01-31
 To download location history for the capture date of a photo, simply use the `photo` mode and specify the path to the photo:
 
 ``` bash
-python extract.py -c cookie photo path/to/photo.jpg
+python extract.py -c cookie -u 1 -r token -o output.kml photo path/to/photo.jpg
 ```
 
 If you specify a directory, location history will be downloaded for all the photos in the directory:
 
 ``` bash
-python extract.py -c cookie photo path/to/directory
+python extract.py -c cookie -u 1 -r token -o output.kml photo path/to/directory
 ```
 
 If you specify multiple paths, location history will be downloaded for all of them:
 
 ``` bash
-python extract.py -c cookie photo path/to/photo.jpg path/to/directory
+python extract.py -c cookie -u 1 -r token -o output.kml photo path/to/photo.jpg path/to/directory
 ```
 
 Use the `-s` or `--subdir` argument to download location history also for photos in subdirectories of the specified directories:
 
 ``` bash
-python extract.py -c cookie photo -s path/to/directory-tree
-```
-
-### Store the location history
-
-The downloaded location history is written to `stdout`. To store it in a file, simply redirect `stdout` to the file:
-
-``` bash
-python extract.py -c cookie date 2020-01-01 > path/to/location-history.kml
+python extract.py -c cookie -u 1 -r token -o output.kml photo -s path/to/directory-tree
 ```
 
 ### Logging output
@@ -185,7 +176,7 @@ After the image is built, just run it to use `TimelineExtractor`. The syntax whe
 For example, the following command will extract location history for the date `2020-01-01` and store it in the file `timeline.kml` in your current working directory:
 
 ``` bash
-docker run extract-timeline -c cookie date 2020-01-01 > timeline.kml
+docker run extract-timeline -c cookie -u 1 -r token -o timeline.kml date 2020-01-01
 ```
 
 When extracting location history for photos, the docker container must be able to access to the photos in order to get their capture dates. This is achieved by mounting the directories containing the photos to the docker container. To mount a directory, use the `-v` or `--volume` argument and specify the absolute path of the directory in the local file system, followed by `:` and the absolute path of where it should be accessible in the container. Use the latter paths when specifying the photos and directories to get location history for.
@@ -193,13 +184,13 @@ When extracting location history for photos, the docker container must be able t
 In the following example, the local directory `/path/to/photos` is mounted to `/photos` in the container. Location history is then calculated for the photo `/photos/my-image.jpg` (refers to `/path/to/photos/my-image.jpg` in the local file system) and the photos contained in `/photos/more-photos` (refers to `/path/to/photos/more-photos` in the local file system).
 
 ``` bash
-docker run -v /path/to/photos:/photos extract-timeline -c cookie photo /photos/my-image.jpg /photos/more-photos
+docker run -v /path/to/photos:/photos extract-timeline -c cookie -u 1 -r token -o output.kml photo /photos/my-image.jpg /photos/more-photos
 ```
 
 If you want to mount a directory using a relative path, you can use `$(pwd)` to denote the current working directory:
 
 ``` bash
-docker run -v "$(pwd):/photos" extract-timeline -c cookie photo /photos
+docker run -v "$(pwd):/photos" extract-timeline -c cookie -u 1 -r token -o output.kml photo /photos
 ```
 
 ## Change log
