@@ -17,17 +17,18 @@ def OutputLocationHistory(History: ET.ElementTree) -> None:
     History.write(sys.stdout.buffer)
 
 
-def GetLocationHistoryForDates(Dates: List[DT.date], AuthCookie: str) -> ET.ElementTree:
+
+def GetLocationHistoryForDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
     logging.info(f'Calculating location history for {len(Dates)} date(s)')
-    return LocationHistory.GetDates(Dates, AuthCookie)
+    return LocationHistory.GetDates(Dates, AuthCookie, authuser, rapt)
 
 
-def GetLocationHistoryForDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str) -> ET.ElementTree:
+def GetLocationHistoryForDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
     logging.info(f'Calculating location history for {StartDate:%Y-%m-%d} to {EndDate:%Y-%m-%d}')
-    return LocationHistory.GetDateRange(StartDate, EndDate, AuthCookie)
+    return LocationHistory.GetDateRange(StartDate, EndDate, AuthCookie, authuser, rapt)
 
 
-def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, AuthCookie: str) -> Optional[ET.ElementTree]:
+def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, AuthCookie: str, authuser: int, rapt: str) -> Optional[ET.ElementTree]:
     DateTimes = set()
     for Path in Paths:
         logging.info(f'Calculating dates for photos in {Path}')
@@ -38,7 +39,7 @@ def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, Auth
         return None
 
     Dates = list(set(map(lambda d: d.date(), DateTimes)))
-    return GetLocationHistoryForDates(Dates, AuthCookie)
+    return GetLocationHistoryForDates(Dates, AuthCookie, authuser, rapt)
 
 
 def StringToDate(DateString: str) -> DT.date:
@@ -49,6 +50,10 @@ def main() -> None:
     Parser = argparse.ArgumentParser(description='Extract location history from Google.')
     Parser.add_argument('-l', '--log', default='info', choices=['debug', 'info', 'warning', 'error', 'critical'], help='Set the logging level.')
     Parser.add_argument('-c', '--cookie', required=True, type=open, help='File containing your Google authentication cookie.')
+    Parser.add_argument('-u', '--authuser', required=True, type=int, help='The authuser number from the Google Maps URL.')
+    Parser.add_argument('-r', '--rapt', required=True, type=str, help='The "re-auth proof token" (rapt) from a Google Maps KML file download url.')
+
+
 
     Subparsers = Parser.add_subparsers(title='mode', dest='mode', required=True, help='How to specify dates to extract location history for.')
 
@@ -74,11 +79,11 @@ def main() -> None:
 
     History = None
     if Args.mode == 'date':
-        History = GetLocationHistoryForDates(Args.date, AuthCookie)
+        History = GetLocationHistoryForDates(Args.date, AuthCookie, Args.authuser, Args.rapt)
     elif Args.mode == 'range':
-        History = GetLocationHistoryForDateRange(Args.start, Args.end, AuthCookie)
+        History = GetLocationHistoryForDateRange(Args.start, Args.end, AuthCookie, Args.authuser, Args.rapt)
     elif Args.mode == 'photo':
-        History = GetLocationHistoryForPaths(Args.photo, Args.subdir, AuthCookie)
+        History = GetLocationHistoryForPaths(Args.photo, Args.subdir, AuthCookie, Args.authuser, Args.rapt)
 
     if History is None:
         logging.error('Location history could not be calculated.')

@@ -54,11 +54,11 @@ def Merge(LocationHistory1: ET.ElementTree, LocationHistory2: ET.ElementTree) ->
     return LocationHistory1
 
 
-def GetDate(Date: DT.date, AuthCookie: str) -> ET.ElementTree:
+def GetDate(Date: DT.date, AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
     """
     Get location history for a date.
     """
-    Url = 'https://www.google.com/maps/timeline/kml?authuser=0&pb=!1m8!1m3!1i{0}!2i{1}!3i{2}!2m3!1i{0}!2i{1}!3i{2}'.format(Date.year, Date.month - 1, Date.day)
+    Url = 'https://www.google.com/maps/timeline/kml?authuser={3}&pb=!1m8!1m3!1i{0}!2i{1}!3i{2}!2m3!1i{0}!2i{1}!3i{2}&pli=1&rapt={4}'.format(Date.year, Date.month - 1, Date.day, authuser, rapt)
 
     Response = requests.get(Url, cookies=dict(cookie=AuthCookie))
     if 200 != Response.status_code:
@@ -67,7 +67,7 @@ def GetDate(Date: DT.date, AuthCookie: str) -> ET.ElementTree:
     return ET.ElementTree(ET.fromstring(Response.text))
 
 
-def GetDates(Dates: List[DT.date], AuthCookie: str) -> ET.ElementTree:
+def GetDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
     """
     Get location history for one or more dates.
     """
@@ -76,26 +76,33 @@ def GetDates(Dates: List[DT.date], AuthCookie: str) -> ET.ElementTree:
 
     SortedDates = sorted(Dates)
 
-    LocationHistory = GetDate(SortedDates[0], AuthCookie)
+    LocationHistory = GetDate(SortedDates[0], AuthCookie, authuser, rapt)
 
     for Date in SortedDates[1:]:
-        LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie))
+        try:
+            LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
+        except:
+            return LocationHistory
 
     return LocationHistory
 
 
-def GetDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str) -> ET.ElementTree:
+def GetDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
     """
     Get location history for a date range.
     """
     if EndDate < StartDate:
         raise Exception('Start date cannot be later than end date.')
 
-    LocationHistory = GetDate(StartDate, AuthCookie)
+    LocationHistory = GetDate(StartDate, AuthCookie, authuser, rapt)
 
     for Delta in range((EndDate - StartDate).days):
         Date = StartDate + DT.timedelta(Delta + 1)
-        LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie))
+        try:
+            LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
+        except:
+            return LocationHistory
+
 
     return LocationHistory
 
