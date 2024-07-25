@@ -1,21 +1,23 @@
 import argparse
 import datetime as DT
 import logging
-import sys
 from typing import List, Optional
 import xml.etree.ElementTree as ET
 import CaptureDate
 import LocationHistory
 
-def OutputLocationHistory(History: ET.ElementTree) -> None:
+def OutputLocationHistory(History: ET.ElementTree, output: argparse.FileType) -> None:
     LocationHistory.RemoveErroneousAltitude(History)
     LocationHistory.ConvertTimeSpanPointToLineString(History)
     LocationHistory.ReorderLineStringAndTimeSpan(History)
 
     # Set the default namespace. Workaround for bug in GPSBabel: https://github.com/gpsbabel/gpsbabel/issues/508
     ET.register_namespace('', 'http://www.opengis.net/kml/2.2')
-    History.write(sys.stdout.buffer)
+    with open(output.name, 'w', encoding='utf-8') as out_file:
+        out_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        out_file.write(ET.tostring(History.getroot(), encoding='utf-8').decode('utf-8'))
 
+    logging.info(f'Location history has been saved to {output.name}')
 
 
 def GetLocationHistoryForDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
@@ -52,6 +54,7 @@ def main() -> None:
     Parser.add_argument('-c', '--cookie', required=True, type=open, help='File containing your Google authentication cookie.')
     Parser.add_argument('-u', '--authuser', required=True, type=int, help='The authuser number from the Google Maps URL.')
     Parser.add_argument('-r', '--rapt', required=True, type=str, help='The "re-auth proof token" (rapt) from a Google Maps KML file download url.')
+    Parser.add_argument('-o', '--output', required=True, type=argparse.FileType('w'), help='Output file to write the extracted location history.')
 
 
 
@@ -88,7 +91,7 @@ def main() -> None:
     if History is None:
         logging.error('Location history could not be calculated.')
     else:
-        OutputLocationHistory(History)
+        OutputLocationHistory(History, Args.output)
 
 if __name__ == '__main__':
     main()

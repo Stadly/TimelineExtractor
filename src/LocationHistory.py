@@ -3,6 +3,7 @@ import re
 import requests
 from typing import List
 import xml.etree.ElementTree as ET
+import logging
 
 def ElementsAreEqual(Element1: ET.Element, Element2: ET.Element) -> bool:
     """
@@ -82,6 +83,7 @@ def GetDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) ->
         try:
             LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
         except:
+            logging.error('Location history could not be downloaded.  You may have been unauthenicated or a Captcha may be required in your browser.  Your output file is being saved with what was downloaded so far.')
             return LocationHistory
 
     return LocationHistory
@@ -101,6 +103,7 @@ def GetDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, authuser
         try:
             LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
         except:
+            logging.error('Location history could not be downloaded.  You may have been unauthenicated or a Captcha may be required in your browser.  Your output file is being saved with what was downloaded so far.')
             return LocationHistory
 
 
