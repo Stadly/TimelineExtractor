@@ -64,6 +64,9 @@ def GetDate(Date: DT.date, AuthCookie: str, authuser: int, rapt: str) -> ET.Elem
     Response = requests.get(Url, cookies=dict(cookie=AuthCookie))
     if 200 != Response.status_code:
         raise Exception('Could not fetch location history.')
+    
+    if not Response.text.startswith('<?xml'):
+        raise Exception('Could not fetch location history.  Check your cookie and reauth proof token (rapt).')
 
     return ET.ElementTree(ET.fromstring(Response.text))
 
