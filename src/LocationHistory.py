@@ -79,10 +79,15 @@ def GetDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) ->
         raise Exception('You must specify at least one date.')
 
     SortedDates = sorted(Dates)
+    total_dates = len(SortedDates)
+    current_date = 1
+    DisplayProgress(SortedDates[0], current_date, total_dates)
 
     LocationHistory = GetDate(SortedDates[0], AuthCookie, authuser, rapt)
 
     for Date in SortedDates[1:]:
+        current_date += 1
+        DisplayProgress(Date, current_date, total_dates)
         try:
             LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
         except:
@@ -99,10 +104,15 @@ def GetDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, authuser
     if EndDate < StartDate:
         raise Exception('Start date cannot be later than end date.')
 
+    total_dates = (EndDate - StartDate).days
+    current_date = 1
+    DisplayProgress(StartDate, current_date, total_dates)
     LocationHistory = GetDate(StartDate, AuthCookie, authuser, rapt)
 
-    for Delta in range((EndDate - StartDate).days):
+    for Delta in range(total_dates):
         Date = StartDate + DT.timedelta(Delta + 1)
+        current_date += 1
+        DisplayProgress(Date, current_date, total_dates)
         try:
             LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
         except:
@@ -175,3 +185,8 @@ def RemoveErroneousAltitude(KmlTree: ET.ElementTree) -> None:
             if Coordinates is not None and Coordinates.text is not None and re.search(RegEx, Coordinates.text):
                 # All altitudes are 0. Remove them.
                 Coordinates.text = re.sub(CoordinatesRegEx, '\\1', Coordinates.text)
+
+
+def DisplayProgress(date: DT.date, current_download: int, total_downloads: int):
+    """Display Current Progress"""
+    print(f'Downloading {date} | {current_download}/{total_downloads} | {current_download/total_downloads*100:.2f}%\r', end='', flush=True)
