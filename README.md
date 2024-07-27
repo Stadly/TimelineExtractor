@@ -49,18 +49,18 @@ Follow the steps below to get your authentication cookie from Google Maps Timeli
 2. Open `Developer tools` (`F12`).
 3. In the console, run this command to download the currently selected day's KML file `document.querySelector('.goog-menuitem.export-kml').click();`.
 4. A new tab will briefly open and your KML download will start.
-  - Depending on your browser settings, you may get a message saying that a pop-up has been prevented from opening; click the message and open the pop-up.
-  - If you are prompted to save or cancel the download, be sure to save it (otherwise the URL may not be logged in the history and we'll need that).
-5. Open the browser history (`CTRL` + `Shift` + `H`).
-6. Copy the most recent URL, which should be something like this: `https://timeline.google.com/maps/timeline/kml?authuser=1&pb=%211m8%211m3%211i1990%212i0%213i1%212m3%211i2090%212i0%213i1&pli=1&rapt=<REAUTH PROOF TOKEN>`.
+   - Depending on your browser settings, you may get a message saying that a pop-up has been prevented from opening; click the message and open the pop-up.
+   - If you are prompted to save or cancel the download, be sure to save it (otherwise the URL may not be logged in the history and we'll need that).
+5. Open the browser history in Firefox (`CTRL` + `Shift` + `H`) or the download history in Chrome (`CTRL` + `J`).
+6. Copy the most recent URL, which should be something like this: `https://timeline.google.com/maps/timeline/kml?authuser=<AUTH USER NUMBER>&pb=%211m8%211m3%211i1990%212i0%213i1%212m3%211i2090%212i0%213i1&pli=1&rapt=<REAUTH PROOF TOKEN>`.
 7. With the Developer tools still open, paste that URL into the address bar of your browser.
 8. A new request will appear in the `Network` tab. Click on it.
 9. Details about the request should appear; look for the `Cookie` in the request headers and copy the cookie value.
 10. Save the cookie's content so you can use it to authenticate requests sent by `TimelineExtractor` when downloading location history. It is recommended to store it in a file called `cookie` in the directory `src`, as that will be assumed in most of the examples further down.
-11. Make note of the `authuser` number in the URL.  Pass this to the `TimelineExtractor` script with the `-u` or `--authuser` argument.
-12. Copy the value of the `rapt` parameter in the URL.  Pass this to the `TimelineExtractor` script with the `-r` or `--rapt` argument.
+11. Make note of the `authuser` number in the URL. Pass this to the `TimelineExtractor` script with the `-u` or `--authuser` argument.
+12. Copy the value of the `rapt` parameter in the URL. Pass this to the `TimelineExtractor` script with the `-r` or `--rapt` argument.
 
-Please note that valid cookie and reauth proof tokens change frequently, so these steps may need to be repeated, depending on your usage of the `TimelineExtractor`.
+Please note that valid cookie and reauth proof tokens change frequently, so these steps may need to be repeated, depending on your usage of `TimelineExtractor`.
 
 ### Install in Docker container
 

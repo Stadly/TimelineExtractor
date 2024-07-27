@@ -55,23 +55,23 @@ def Merge(LocationHistory1: ET.ElementTree, LocationHistory2: ET.ElementTree) ->
     return LocationHistory1
 
 
-def GetDate(Date: DT.date, AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
+def GetDate(Date: DT.date, AuthCookie: str, AuthUser: int, Rapt: str) -> ET.ElementTree:
     """
     Get location history for a date.
     """
-    Url = 'https://www.google.com/maps/timeline/kml?authuser={3}&pb=!1m8!1m3!1i{0}!2i{1}!3i{2}!2m3!1i{0}!2i{1}!3i{2}&pli=1&rapt={4}'.format(Date.year, Date.month - 1, Date.day, authuser, rapt)
+    Url = 'https://www.google.com/maps/timeline/kml?authuser={3}&pb=!1m8!1m3!1i{0}!2i{1}!3i{2}!2m3!1i{0}!2i{1}!3i{2}&pli=1&rapt={4}'.format(Date.year, Date.month - 1, Date.day, AuthUser, Rapt)
 
     Response = requests.get(Url, cookies=dict(cookie=AuthCookie))
     if 200 != Response.status_code:
         raise Exception('Could not fetch location history.')
     
     if not Response.text.startswith('<?xml'):
-        raise Exception('Could not fetch location history.  Check your cookie and reauth proof token (rapt).')
+        raise Exception('Could not fetch location history. Check your cookie and reauth proof token (rapt).')
 
     return ET.ElementTree(ET.fromstring(Response.text))
 
 
-def GetDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
+def GetDates(Dates: List[DT.date], AuthCookie: str, AuthUser: int, Rapt: str) -> ET.ElementTree:
     """
     Get location history for one or more dates.
     """
@@ -79,44 +79,44 @@ def GetDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) ->
         raise Exception('You must specify at least one date.')
 
     SortedDates = sorted(Dates)
-    total_dates = len(SortedDates)
-    current_date = 1
-    DisplayProgress(SortedDates[0], current_date, total_dates)
+    TotalDates = len(SortedDates)
+    CurrentDate = 1
+    DisplayProgress(SortedDates[0], CurrentDate, TotalDates)
 
-    LocationHistory = GetDate(SortedDates[0], AuthCookie, authuser, rapt)
+    LocationHistory = GetDate(SortedDates[0], AuthCookie, AuthUser, Rapt)
 
     for Date in SortedDates[1:]:
-        current_date += 1
-        DisplayProgress(Date, current_date, total_dates)
+        CurrentDate += 1
+        DisplayProgress(Date, CurrentDate, TotalDates)
         try:
-            LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
+            LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, AuthUser, Rapt))
         except:
-            logging.error('Location history could not be downloaded.  You may have been unauthenicated or a Captcha may be required in your browser.  Your output file is being saved with what was downloaded so far.')
+            logging.error('Location history could not be downloaded. You may have been unauthenicated or a Captcha may be required in your browser. Your output file is being saved with what was downloaded so far.')
             return LocationHistory
 
     return LocationHistory
 
 
-def GetDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
+def GetDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, AuthUser: int, Rapt: str) -> ET.ElementTree:
     """
     Get location history for a date range.
     """
     if EndDate < StartDate:
         raise Exception('Start date cannot be later than end date.')
 
-    total_dates = (EndDate - StartDate).days
-    current_date = 1
-    DisplayProgress(StartDate, current_date, total_dates)
-    LocationHistory = GetDate(StartDate, AuthCookie, authuser, rapt)
+    TotalDates = (EndDate - StartDate).days
+    CurrentDate = 1
+    DisplayProgress(StartDate, CurrentDate, TotalDates)
+    LocationHistory = GetDate(StartDate, AuthCookie, AuthUser, Rapt)
 
-    for Delta in range(total_dates):
+    for Delta in range(TotalDates):
         Date = StartDate + DT.timedelta(Delta + 1)
-        current_date += 1
-        DisplayProgress(Date, current_date, total_dates)
+        CurrentDate += 1
+        DisplayProgress(Date, CurrentDate, TotalDates)
         try:
-            LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, authuser, rapt))
+            LocationHistory = Merge(LocationHistory, GetDate(Date, AuthCookie, AuthUser, Rapt))
         except:
-            logging.error('Location history could not be downloaded.  You may have been unauthenicated or a Captcha may be required in your browser.  Your output file is being saved with what was downloaded so far.')
+            logging.error('Location history could not be downloaded. You may have been unauthenicated or a Captcha may be required in your browser. Your output file is being saved with what was downloaded so far.')
             return LocationHistory
 
 

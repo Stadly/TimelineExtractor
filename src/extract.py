@@ -6,31 +6,31 @@ import xml.etree.ElementTree as ET
 import CaptureDate
 import LocationHistory
 
-def OutputLocationHistory(History: ET.ElementTree, output: argparse.FileType) -> None:
+def OutputLocationHistory(History: ET.ElementTree, Output: argparse.FileType) -> None:
     LocationHistory.RemoveErroneousAltitude(History)
     LocationHistory.ConvertTimeSpanPointToLineString(History)
     LocationHistory.ReorderLineStringAndTimeSpan(History)
 
     # Set the default namespace. Workaround for bug in GPSBabel: https://github.com/gpsbabel/gpsbabel/issues/508
     ET.register_namespace('', 'http://www.opengis.net/kml/2.2')
-    with open(output.name, 'w', encoding='utf-8') as out_file:
-        out_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        out_file.write(ET.tostring(History.getroot(), encoding='utf-8').decode('utf-8'))
+    with open(Output.name, 'w', encoding='utf-8') as OutputFile:
+        OutputFile.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        OutputFile.write(ET.tostring(History.getroot(), encoding='utf-8').decode('utf-8'))
 
-    logging.info(f'Location history has been saved to {output.name}')
+    logging.info(f'Location history has been saved to {Output.name}')
 
 
-def GetLocationHistoryForDates(Dates: List[DT.date], AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
+def GetLocationHistoryForDates(Dates: List[DT.date], AuthCookie: str, AuthUser: int, Rapt: str) -> ET.ElementTree:
     logging.info(f'Calculating location history for {len(Dates)} date(s)')
-    return LocationHistory.GetDates(Dates, AuthCookie, authuser, rapt)
+    return LocationHistory.GetDates(Dates, AuthCookie, AuthUser, Rapt)
 
 
-def GetLocationHistoryForDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, authuser: int, rapt: str) -> ET.ElementTree:
+def GetLocationHistoryForDateRange(StartDate: DT.date, EndDate: DT.date, AuthCookie: str, AuthUser: int, Rapt: str) -> ET.ElementTree:
     logging.info(f'Calculating location history for {StartDate:%Y-%m-%d} to {EndDate:%Y-%m-%d}')
-    return LocationHistory.GetDateRange(StartDate, EndDate, AuthCookie, authuser, rapt)
+    return LocationHistory.GetDateRange(StartDate, EndDate, AuthCookie, AuthUser, Rapt)
 
 
-def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, AuthCookie: str, authuser: int, rapt: str) -> Optional[ET.ElementTree]:
+def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, AuthCookie: str, AuthUser: int, Rapt: str) -> Optional[ET.ElementTree]:
     DateTimes = set()
     for Path in Paths:
         logging.info(f'Calculating dates for photos in {Path}')
@@ -41,7 +41,7 @@ def GetLocationHistoryForPaths(Paths: List[str], VisitSubdirectories: bool, Auth
         return None
 
     Dates = list(set(map(lambda d: d.date(), DateTimes)))
-    return GetLocationHistoryForDates(Dates, AuthCookie, authuser, rapt)
+    return GetLocationHistoryForDates(Dates, AuthCookie, AuthUser, Rapt)
 
 
 def StringToDate(DateString: str) -> DT.date:
