@@ -7,13 +7,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [Unreleased](https://github.com/Stadly/TimelineExtractor/compare/v1.1.0...HEAD)
 
 ### Added
-- Nothing
+- Download progress. Thanks @GRWalter!
 
 ### Changed
 - Nothing
 
 ### Fixed
-- Nothing
+- Authentication to Google Maps. Thanks @GRWalter!
 
 ### Deprecated
 - Nothing
